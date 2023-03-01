@@ -10,7 +10,8 @@ const app = express();
 
 const start = async () => {
   try {
-
+    await sequelize.authenticate(); //подключение к БД
+    await sequelize.sync(); // синхронизация состояния БД со схемой данных
     app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
   } catch (error) {
     console.log(error)
