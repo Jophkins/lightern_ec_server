@@ -1,7 +1,7 @@
 const {Sequelize} = require('sequelize');
 
 
-// Инициализация соединения с БД
+// bd connection init
 module.exports = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
