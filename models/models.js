@@ -5,8 +5,7 @@ const Administrator = sequelize.define('administrator', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   email: {type: DataTypes.STRING, unique: true},
   password: {type: DataTypes.STRING},
-  createdAt: {type: DataTypes.DATE},
-  updatedAt: {type: DataTypes.DATE},
+  role: {type: DataTypes.STRING, defaultValue: "ADMIN"},
 });
 
 const Product = sequelize.define('product', {
@@ -34,8 +33,6 @@ const Order = sequelize.define('order', {
   customerName: {type: DataTypes.STRING, allowNull: false},
   status: {type: DataTypes.STRING, defaultValue: 'OPEN'},
   totalPrice: {type: DataTypes.INTEGER, allowNull: false},
-  createdAt: {type: DataTypes.DATE},
-  updatedAt: {type: DataTypes.DATE},
 });
 
 const OrderInfo = sequelize.define('order_info', {
