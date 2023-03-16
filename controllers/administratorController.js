@@ -14,19 +14,23 @@ const generateJwt = (id, email, role) => {
 
 class AdministratorController {
   async registration(req, res, next) {
-    const {email, password, role} = req.body;
-    if (!email || !password) {
-      return next(ApiError.badRequest('Неверный email или пароль'));
+    try {
+      const {email, password, role} = req.body;
+      if (!email || !password) {
+        return next(ApiError.badRequest('Неверный email или пароль'));
+      }
+      const candidate = await Administrator.findOne({where: {email}});
+      if (candidate) {
+        return next(ApiError.badRequest('Пользователь с таким email уже существует'));
+      }
+      const hashPassword = await bcrypt.hash(password, 5);
+      const admin = await Administrator.create({email, password: hashPassword});
+      const order = await Order.create({administratorId: admin.id});
+      const token = generateJwt(admin.id, admin.email);
+      return res.json(token);
+    } catch (e) {
+      return res.json(e.message)
     }
-    const candidate = await Administrator.findOne({where: {email}});
-    if (candidate) {
-      return next(ApiError.badRequest('Пользователь с таким email уже существует'));
-    }
-    const hashPassword = await bcrypt.hash(password, 5);
-    const admin = await Administrator.create({email, password: hashPassword});
-    const order = await Order.create({administratorId: admin.id});
-    const token = generateJwt(admin.id, admin.email);
-    return res.json(token);
   }
 
   async login(req, res, next) {
@@ -44,7 +48,7 @@ class AdministratorController {
   }
 
   async check(req, res, next) {
-    const token = generateJwt(req.admin.id, req.admin.email);
+    const token = generateJwt(req.admin.id, req.admin.email, req.admin.role);
     return res.json({token});
   }
 
