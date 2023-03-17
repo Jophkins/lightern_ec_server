@@ -19,12 +19,12 @@ class TypeController {
       const { name } = req.body;
       const type = await Type.findByPk(typeId);
       if (!type) {
-        throw new ApiError(`Категория с идентификатором ${typeId} не найдена`);
+        next(ApiError.badRequest(`Категория с идентификатором ${typeId} не найдена`));
       }
       type.name = name;
       await type.save();
       return res.json(type);
-      
+
     } catch (error) {
       next(ApiError.badRequest(error.message));
     }

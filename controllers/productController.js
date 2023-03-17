@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const path = require('path');
 const {Product, ProductInfo} = require('../models/models');
 const ApiError = require('../error/ApiError');
+const {logger} = require("sequelize/lib/utils/logger");
 
 class productController {
   async create(req, res, next) {
@@ -105,13 +106,13 @@ class productController {
       if (info) {
         const productInfo = JSON.parse(info);
         await ProductInfo.destroy({where: {productId: id}});
-        productInfo.forEach(async (i) => {
+        for (const i of productInfo) {
           await ProductInfo.create({
             title: i.title,
             description: i.description,
             productId: product.id,
           });
-        });
+        }
       }
 
       await product.save();

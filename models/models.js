@@ -11,7 +11,7 @@ const Administrator = sequelize.define('administrator', {
 const Product = sequelize.define('product', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   article: {type: DataTypes.STRING, unique: true, allowNull: false},
-  name: {type: DataTypes.STRING, unique: true, allowNull: false},
+  name: {type: DataTypes.STRING, unique: false, allowNull: false},
   price: {type: DataTypes.INTEGER, allowNull: false},
   img: {type: DataTypes.STRING, allowNull: false},
 });
