@@ -11,6 +11,16 @@ class productController {
       let fileName = uuid.v4() + ".jpg";
       await img.mv(path.resolve(__dirname, '..', 'static', fileName));
 
+      if (typeId === 'undefined') {
+        next(ApiError.badRequest('Категория товара не выбрана'));
+      }
+
+      // if product with provided article is already exist - throw an error
+      const existingArticle = await Product.findOne({ where: { article } });
+      if (existingArticle) {
+        next(ApiError.alreadyExist('Такой АРТИКУЛ уже существует'));
+      }
+
       const product = await Product.create({article, name, price, typeId, img: fileName});
 
       if (info) {
@@ -24,7 +34,7 @@ class productController {
 
       return res.json(product)
     } catch (error) {
-      next(ApiError.badRequest(error.message));
+      next(ApiError.badRequest400(error.message));
     }
   }
 
@@ -76,7 +86,7 @@ class productController {
       const product = await Product.findByPk(id);
 
       if (!product) {
-        throw new Error('Товар не найден');
+        next(ApiError.badRequest('Товар не найден'));
       }
 
       if (article) {
@@ -108,7 +118,7 @@ class productController {
 
       return res.json(product);
     } catch (error) {
-      next(ApiError.badRequest(error.message));
+      next(ApiError.badRequest400(error.message));
     }
   }
 
@@ -118,7 +128,7 @@ class productController {
       const product = await Product.findByPk(id);
 
       if (!product) {
-        throw new Error('Товар не найден');
+        next(ApiError.badRequest('Товар не найден'));
       }
       await product.destroy();
 
