@@ -35,7 +35,7 @@ class productController {
       limit = limit || 9;
       let offset = page * limit - limit;
       let products;
-      if(!typeId && !article) {
+      if (!typeId && !article) {
         products = await Product.findAndCountAll({limit, offset});
       }
       if (typeId && !article) {
@@ -69,9 +69,52 @@ class productController {
     }
   }
 
+  async editProduct(req, res, next) {
+    try {
+      const {id} = req.params;
+      const {article, name, price, typeId, info} = req.body;
+      const product = await Product.findByPk(id);
+
+      if (!product) {
+        throw new Error('Товар не найден');
+      }
+
+      if (article) {
+        product.article = article;
+      }
+      if (name) {
+        product.name = name;
+      }
+      if (price) {
+        product.price = price;
+      }
+      if (typeId) {
+        product.typeId = typeId;
+      }
+
+      if (info) {
+        const productInfo = JSON.parse(info);
+        await ProductInfo.destroy({where: {productId: id}});
+        productInfo.forEach(async (i) => {
+          await ProductInfo.create({
+            title: i.title,
+            description: i.description,
+            productId: product.id,
+          });
+        });
+      }
+
+      await product.save();
+
+      return res.json(product);
+    } catch (error) {
+      next(ApiError.badRequest(error.message));
+    }
+  }
+
   async removeProduct(req, res, next) {
     try {
-      const { id } = req.params;
+      const {id} = req.params;
       const product = await Product.findByPk(id);
 
       if (!product) {
