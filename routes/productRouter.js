@@ -10,5 +10,4 @@ router.get('/:id', productController.getOne);
 router.patch('/:id', checkRole('ADMIN'), productController.editProduct);
 router.delete('/:id', checkRole('ADMIN'), productController.removeProduct);
 
-
 module.exports = router;
