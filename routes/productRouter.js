@@ -9,5 +9,6 @@ router.get('/', productController.getAll);
 router.get('/:id', productController.getOne);
 router.patch('/:id', checkRole('ADMIN'), productController.editProduct);
 router.delete('/:id', checkRole('ADMIN'), productController.removeProduct);
+router.patch('/:id/image', checkRole('ADMIN'), productController.replaceProductImage);
 
 module.exports = router;

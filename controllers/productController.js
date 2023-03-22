@@ -3,6 +3,7 @@ const path = require('path');
 const {Product, ProductInfo} = require('../models/models');
 const ApiError = require('../error/ApiError');
 const {logger} = require("sequelize/lib/utils/logger");
+const fs = require('fs/promises');
 
 class productController {
   async create(req, res, next) {
@@ -131,10 +132,42 @@ class productController {
       if (!product) {
         next(ApiError.badRequest('Товар не найден'));
       }
+
+      const imgFilePath = path.resolve(__dirname, '..', 'static', product.img);
+      await fs.unlink(imgFilePath);
+
       await product.destroy();
 
       return res.json({message: 'Товар был удален'});
 
+    } catch (error) {
+      next(ApiError.badRequest(error.message));
+    }
+  }
+
+  async replaceProductImage(req, res, next) {
+    try {
+      const {id} = req.params;
+      const product = await Product.findByPk(id);
+
+      if (!product) {
+        next(ApiError.badRequest('Товар не найден'));
+      }
+
+      // Get the old image file path and delete the old image
+      const oldImgFilePath = path.resolve(__dirname, '..', 'static', product.img);
+      await fs.unlink(oldImgFilePath);
+
+      // Save the new image file
+      const {img} = req.files;
+      const newFileName = uuid.v4() + ".jpg";
+      await img.mv(path.resolve(__dirname, '..', 'static', newFileName));
+
+      // Update the product's img field with the new file name
+      product.img = newFileName;
+      await product.save();
+
+      return res.json({message: 'Изображение товара успешно заменено', product});
     } catch (error) {
       next(ApiError.badRequest(error.message));
     }
